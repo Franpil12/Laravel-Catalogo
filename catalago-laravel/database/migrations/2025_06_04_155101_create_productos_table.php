@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('descripcion');
             $table->decimal('precio', 10, 2);
             $table->string('imagen')->nullable();
-            $table->foreignId('stock')->default(0);
+            $table->integer('stock')->default(0);
             $table->timestamps();
         });
     }

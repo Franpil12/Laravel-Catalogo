@@ -21,7 +21,7 @@ class ProductoController extends Controller
      */
     public function store(Request $request)
     {
-        $validate = $request->validate([
+        $validatedData = $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'required|string',
             'precio' => 'required|numeric|min:0',
@@ -32,7 +32,7 @@ class ProductoController extends Controller
         ]);
 
 
-        $product= DB::transaction(function () use ($validatedData) {
+        $product= DB::transaction(function () use ($validatedData, $request) {
             $producto = Producto::create($validatedData);
 
             if ($request->has('categorias')) {
