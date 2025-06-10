@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\AuthController;
 use App\Http\Middleware\IsAdmin;
+use App\Http\Controllers\CategoriaController;
 
 
 //Routas Publicas
@@ -14,6 +15,7 @@ Route::post('/login', [AuthController::class, 'login']);
 //Productos
 Route::get('productos', [ProductoController::class, 'index']);
 Route::get('productos/{id}', [ProductoController::class, 'show']);
+Route::get('categorias', [CategoriaController::class, 'index']);
 
 //Rutasn protegidas
 Route::middleware('auth:sanctum')->group(function () {

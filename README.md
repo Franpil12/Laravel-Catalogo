@@ -1,3 +1,7 @@
+Version 1.13
+-Agregacion de Categoria Controller
+-Adicion de api para categorias
+
 Version 1.12
 -Agregacion de un madleware
 
