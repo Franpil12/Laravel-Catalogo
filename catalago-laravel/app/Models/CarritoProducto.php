@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CarritoProducto extends Model
 {
-    protected $table = 'carrito_producto';
+    protected $table = 'carrito_producto'; // Asegura el nombre de la tabla
 
     protected $fillable = ['carrito_id', 'producto_id', 'cantidad'];
 

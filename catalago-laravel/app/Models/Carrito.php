@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Carrito extends Model
 {
-
     protected $fillable = ['usuario_id', 'estado'];
 
     public function usuario()
@@ -16,6 +15,7 @@ class Carrito extends Model
 
     public function productos()
     {
+        // Un Carrito tiene muchos CarritoProducto (ítems en el carrito)
         return $this->hasMany(CarritoProducto::class, 'carrito_id');
     }
 }

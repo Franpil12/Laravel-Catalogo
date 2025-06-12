@@ -40,7 +40,7 @@ class User extends Authenticatable
     }
 
     public function direcciones(){
-        return $this->hasMany(Direccion::class, 'usuario_id');
+        return $this->hasMany(Direcciones::class, 'usuario_id');
     }
     
 }

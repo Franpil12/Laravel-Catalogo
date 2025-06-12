@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('carrito', function (Blueprint $table) {
+        Schema::create('carritos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('usuario_id')->constrained('users')->unique()->onDelate('cascade');
+            $table->foreignId('usuario_id')->constrained('users')->unique()->onDelete('cascade');
             $table->string('estado')->default('activo'); // activo, pendiente, completado, cancelado
             $table->timestamps();
         });
