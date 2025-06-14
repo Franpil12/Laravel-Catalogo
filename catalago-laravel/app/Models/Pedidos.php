@@ -15,7 +15,7 @@ class Pedidos extends Model
     protected $table = 'pedidos';
 
     protected $fillable = [
-        'usuario_id', 'direccion_id', 'total', 'estado', 'fecha_pedido',
+        'usuario_id', 'direccion_id', 'total', 'estado', 'fecha_pedido', 'visible',
     ];
 
     protected $dates = ['fecha_pedido'];
@@ -33,5 +33,10 @@ class Pedidos extends Model
     public function productos()
     {
         return $this->hasMany(PedidosProductos::class, 'pedido_id');
+    }
+
+    public function scopeVisible($query)
+    {
+        return $query->where('visible', true);
     }
 }

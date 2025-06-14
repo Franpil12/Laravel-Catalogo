@@ -24,6 +24,7 @@ class PedidoController extends Controller
     {
         $user = $request->user();
         $pedidos = Pedidos::where('usuario_id', $user->id)
+                         ->where('visible', true)
                          ->with('direccion', 'productos.producto')
                          ->orderBy('created_at', 'desc')
                          ->get();
@@ -43,6 +44,7 @@ class PedidoController extends Controller
         $user = $request->user();
         $pedido = Pedidos::where('usuario_id', $user->id)
                          ->where('id', $id)
+                         ->where('visible', true)
                          ->with('direccion', 'productos.producto')
                          ->first();
 
@@ -164,43 +166,23 @@ class PedidoController extends Controller
      * @param  \App\Models\Pedidos  $pedido // Usar tu modelo Pedidos
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Pedidos $pedido) // Tipo correcto de modelo
+    public function destroy(Pedidos $pedido)
     {
-        // Verificar que el usuario autenticado sea el dueño del pedido o un administrador
+        // Verificar permisos como ya tienes
         if (Auth::id() !== $pedido->usuario_id && Auth::user()->rol !== 'admin') {
             return response()->json(['message' => 'No tienes permiso para eliminar este pedido.'], 403);
         }
 
-        // Verificar el estado del pedido antes de eliminar
-        // Solo permitir eliminación si el estado es 'completado' o 'cancelado' (o si es admin)
         if (! (Auth::user()->rol === 'admin' || ($pedido->estado === 'completado' || $pedido->estado === 'cancelado'))) {
-             return response()->json(['message' => 'Solo se pueden eliminar pedidos completados o cancelados (a menos que seas administrador).'], 400);
+            return response()->json(['message' => 'Solo se pueden eliminar pedidos completados o cancelados (a menos que seas administrador).'], 400);
         }
 
-        DB::beginTransaction();
         try {
-            // Opcional: revertir stock si es un pedido que se cancela/elimina
-            // Esto solo tiene sentido si el stock se decrementó y el pedido no se completó.
-            // Decide si quieres revertir stock al eliminar un pedido.
-            // Por ejemplo, si un admin "elimina" un pedido que estaba "pendiente" o "procesando"
-            // foreach ($pedido->productos as $pedidoProducto) {
-            //     $producto = Producto::find($pedidoProducto->producto_id);
-            //     if ($producto) {
-            //         $producto->stock += $pedidoProducto->cantidad;
-            //         $producto->save();
-            //     }
-            // }
+            $pedido->visible = false;  // <-- Aquí hacemos el borrado lógico
+            $pedido->save();
 
-            // Eliminar los productos asociados al pedido en la tabla pivote
-            $pedido->productos()->delete();
-            
-            // Eliminar el pedido
-            $pedido->delete();
-
-            DB::commit();
-            return response()->json(['message' => 'Pedido eliminado exitosamente.'], 200);
+            return response()->json(['message' => 'Pedido eliminado (borrado lógico) exitosamente.'], 200);
         } catch (\Exception $e) {
-            DB::rollBack();
             return response()->json(['message' => 'Error al eliminar el pedido: ' . $e->getMessage()], 500);
         }
     }
@@ -221,8 +203,9 @@ class PedidoController extends Controller
 
         // Cargar TODOS los pedidos con sus relaciones (productos.producto, user y direccion)
         // Usamos 'usuario' si esa es la relación en tu modelo Pedidos
-        $pedidos = Pedidos::with(['productos.producto', 'usuario', 'direccion'])
-                        ->orderBy('created_at', 'desc') // Ordenar por los más recientes
+        $pedidos = Pedidos::where('visible', true)
+                        ->with(['productos.producto', 'usuario', 'direccion'])
+                        ->orderBy('created_at', 'desc')
                         ->get();
 
         return response()->json($pedidos);
